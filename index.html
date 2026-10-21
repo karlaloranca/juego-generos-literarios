@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Literatura en Juego - Trivia de Géneros Literarios</title>
+    
+    <!-- Fuentes Google -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400&display=swap" rel="stylesheet">
+    
+    <!-- Librerías Externas -->
+    <script src="https://cdn.jsdelivr.net/npm/lucide@0.469.0/dist/umd/lucide.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.14.5/dist/sweetalert2.all.min.js"></script>
+
+    <style>
+:root{
+--bg-color:#eceee6;--card-bg:#fbfbf7;--text-main:#172036;--text-muted:#5d6577;
+--accent-primary:#1f4e8c;--accent-primary-hover:#173d70;--accent-secondary:#7b3fa0;--accent-secondary-hover:#623081;
+--gold:#b7862a;--correct-bg:#e3f3ec;--correct-border:#1f7a5f;--correct-text:#124a39;
+--incorrect-bg:#fbe9e5;--incorrect-border:#c2412d;--incorrect-text:#6e2217;
+--border-color:#d5d8cd;--g-narr:#1f4e8c;--g-poe:#7b3fa0;--g-dra:#b4412e;--g-ens:#1f7a5f;
+--shadow-sm:0 1px 2px rgba(23,32,54,.08);--shadow-md:0 2px 0 rgba(23,32,54,.04),0 12px 28px -14px rgba(23,32,54,.25);--shadow-lg:0 20px 40px -20px rgba(23,32,54,.35);
+--radius-md:10px;--radius-lg:16px;
+--font-sans:'DM Sans',system-ui,sans-serif;--font-serif:'Fraunces',Georgia,serif}
+[data-theme="dark"]{
+--bg-color:#0e1320;--card-bg:#171e2e;--text-main:#ece8dc;--text-muted:#9aa3b8;
+--accent-primary:#7fa6e8;--accent-primary-hover:#a3c1f2;--accent-secondary:#b58ae0;--accent-secondary-hover:#c9a6ee;
+--gold:#e0b04e;--correct-bg:#12392e;--correct-border:#3fb590;--correct-text:#bdeedd;
+--incorrect-bg:#431a14;--incorrect-border:#ee7560;--incorrect-text:#ffd5cc;
+--border-color:#2a3348;--g-narr:#7fa6e8;--g-poe:#b58ae0;--g-dra:#ee8a73;--g-ens:#4fc2a0;
+--shadow-sm:0 1px 2px rgba(0,0,0,.4);--shadow-md:0 12px 28px -14px rgba(0,0,0,.7);--shadow-lg:0 20px 40px -20px rgba(0,0,0,.8)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-sans);background:var(--bg-color);color:var(--text-main);transition:background-color .3s,color .3s;line-height:1.6;overflow-x:hidden;display:flex;justify-content:center;min-height:100vh;
+background-image:repeating-linear-gradient(0deg,transparent 0 31px,rgba(23,32,54,.035) 31px 32px)}
+[data-theme="dark"] body{background-image:repeating-linear-gradient(0deg,transparent 0 31px,rgba(255,255,255,.025) 31px 32px)}
+button{font-family:inherit;cursor:pointer;border:none;background:none}
+button:focus-visible,input:focus-visible,select:focus-visible,label:focus-visible{outline:3px solid var(--accent-secondary);outline-offset:2px}
+#app{width:100%;max-width:860px;padding:24px 20px 48px;position:relative}
+.screen{display:none}.screen.active{display:block;animation:fadeIn .35s ease both}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+h1,h2,h3{font-family:var(--font-serif);font-weight:600;color:var(--text-main);letter-spacing:-.01em;line-height:1.15}
+h2 i,h3 i,h2 svg,h3 svg{vertical-align:-3px;margin-right:.35rem}
+.title-main{font-size:clamp(2.6rem,8vw,4.4rem);text-align:center;margin-bottom:.75rem;font-weight:700;color:var(--text-main);font-variation-settings:"opsz" 144}
+.subtitle{font-size:1.15rem;text-align:center;color:var(--text-muted);margin-bottom:1.5rem;max-width:36ch;margin-inline:auto}
+.card{background:var(--card-bg);border-radius:var(--radius-lg);padding:2rem;box-shadow:var(--shadow-md);border:1px solid var(--border-color);transition:background-color .3s,border-color .3s}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;padding:.8rem 1.5rem;border-radius:var(--radius-md);font-weight:600;font-size:1rem;transition:transform .15s,background-color .2s,color .2s,box-shadow .2s}
+.btn:disabled{opacity:.6;cursor:not-allowed}
+.btn svg{width:18px;height:18px}
+.btn-primary{background:var(--text-main);color:var(--card-bg);box-shadow:0 3px 0 rgba(0,0,0,.25)}
+.btn-primary:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 5px 0 rgba(0,0,0,.25)}
+.btn-primary:active{transform:translateY(1px);box-shadow:0 1px 0 rgba(0,0,0,.25)}
+.btn-secondary{border:1.5px solid var(--text-main);color:var(--text-main)}
+.btn-secondary:hover:not(:disabled){background:var(--text-main);color:var(--card-bg)}
+.btn-option{width:100%;text-align:left;padding:.85rem 1rem;background:var(--card-bg);border:1.5px solid var(--border-color);border-radius:var(--radius-md);color:var(--text-main);font-size:1.02rem;display:flex;align-items:center;gap:.85rem;transition:transform .15s,border-color .15s,background-color .15s}
+.opt-letter{flex:none;width:34px;height:34px;border-radius:8px;display:grid;place-items:center;font-family:var(--font-serif);font-weight:700;background:var(--bg-color);border:1.5px solid var(--border-color);transition:inherit}
+.opt-text{flex:1;line-height:1.35}
+.icon-wrapper{flex:none;display:flex;color:var(--text-muted)}
+.btn-option:hover:not(:disabled){border-color:var(--text-main);transform:translateX(4px)}
+.btn-option:hover:not(:disabled) .opt-letter{background:var(--text-main);color:var(--card-bg);border-color:var(--text-main)}
+.btn-option:disabled{cursor:default}
+.btn-option.correct{border-color:var(--correct-border);background:var(--correct-bg);color:var(--correct-text)}
+.btn-option.correct .opt-letter{background:var(--correct-border);border-color:var(--correct-border);color:#fff}
+.btn-option.correct .icon-wrapper{color:var(--correct-border)}
+.btn-option.incorrect{border-color:var(--incorrect-border);background:var(--incorrect-bg);color:var(--incorrect-text);animation:shake .35s}
+.btn-option.incorrect .opt-letter{background:var(--incorrect-border);border-color:var(--incorrect-border);color:#fff}
+.btn-option.incorrect .icon-wrapper{color:var(--incorrect-border)}
+@keyframes shake{25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+.spines{display:flex;justify-content:center;align-items:flex-end;gap:6px;margin:1.75rem 0 .5rem;height:150px}
+.spines i{display:block;width:var(--w,34px);height:var(--h);background:var(--c);border-radius:4px 4px 2px 2px;position:relative;box-shadow:inset -5px 0 0 rgba(0,0,0,.18),var(--shadow-sm);transform-origin:bottom left;animation:rise .7s cubic-bezier(.2,.8,.2,1) both}
+.spines i::before,.spines i::after{content:"";position:absolute;left:0;right:0;height:3px;background:rgba(255,255,255,.55);top:14px}
+.spines i::after{top:20px;opacity:.6}
+.spines i:nth-child(1){animation-delay:.05s}.spines i:nth-child(2){animation-delay:.15s}.spines i:nth-child(3){animation-delay:.25s}.spines i:nth-child(4){animation-delay:.35s}
+.spines i.lean{transform:rotate(9deg);margin-left:10px}
+@keyframes rise{from{transform:scaleY(0)}to{transform:scaleY(1)}}
+.shelf{height:8px;background:var(--text-main);border-radius:2px;max-width:260px;margin:0 auto 1.75rem;opacity:.85}
+.hero-illustration{text-align:center;margin:1.5rem 0}
+.flex-center{display:flex;justify-content:center;align-items:center}
+.flex-between{display:flex;justify-content:space-between;align-items:center}
+.flex-wrap{flex-wrap:wrap}.gap-4{gap:1rem}
+.grid-2{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:1rem}
+.stack{display:flex;flex-direction:column;gap:.9rem}
+.mt-4{margin-top:1rem}.mt-8{margin-top:2rem}.mb-2{margin-bottom:.5rem}.mb-4{margin-bottom:1rem}
+.text-center{text-align:center}
+.genre-card{background:var(--bg-color);border-radius:var(--radius-md);padding:1.1rem 1.2rem 1.2rem;border-left:6px solid var(--c)}
+.genre-card h3{color:var(--c);font-size:1.3rem}
+.genre-card p{font-size:.92rem;margin-top:.4rem;color:var(--text-main)}
+.players-panel{display:flex;flex-wrap:wrap;gap:.6rem;justify-content:center;margin-bottom:1.25rem}
+.player-badge{background:var(--card-bg);border:1.5px solid var(--border-color);padding:.4rem .9rem;border-radius:99px;display:flex;align-items:center;gap:.45rem;font-weight:500;font-size:.95rem;transition:all .3s;opacity:.6}
+.player-badge svg{width:16px;height:16px}
+.player-badge.active{opacity:1;border-color:var(--text-main);background:var(--text-main);color:var(--card-bg);font-weight:700}
+.fragment-box{position:relative;background:var(--bg-color);border-left:5px solid var(--gold);padding:1.6rem 1.5rem 1.3rem 3.2rem;margin:1.25rem 0;border-radius:0 var(--radius-md) var(--radius-md) 0;font-family:var(--font-serif);font-size:1.2rem;line-height:1.7;font-style:italic}
+.fragment-box::before{content:"\201C";position:absolute;left:.7rem;top:-.1rem;font-size:4rem;line-height:1;color:var(--gold);font-style:normal}
+.fragment-author{display:block;margin-top:.8rem;font-family:var(--font-sans);font-size:.88rem;font-style:normal;color:var(--text-muted);text-align:right}
+.game-header{background:var(--card-bg);padding:.85rem 1rem;border-radius:var(--radius-md);box-shadow:var(--shadow-sm);margin-bottom:.75rem;position:sticky;top:10px;z-index:10;border:1px solid var(--border-color)}
+.progress-bar-container{width:100%;height:6px;background:var(--border-color);border-radius:4px;overflow:hidden}
+.progress-bar{height:100%;background:var(--gold);transition:width .4s ease}
+.timer{font-size:1.15rem;font-weight:700;display:flex;align-items:center;gap:.35rem;font-variant-numeric:tabular-nums}
+.timer svg{width:18px;height:18px}
+.timer-track{width:56px;height:6px;border-radius:3px;background:var(--border-color);overflow:hidden}
+#timer-fill{height:100%;width:100%;background:var(--accent-primary);transition:width 1s linear,background-color .3s}
+.timer.warning{color:var(--incorrect-border)}.timer.warning #timer-fill{background:var(--incorrect-border)}
+.timer.warning{animation:pulse 1s infinite}
+@keyframes pulse{50%{opacity:.55}}
+#q-text{font-family:var(--font-serif)!important;font-weight:600;line-height:1.3}
+.feedback-panel{margin-top:1.5rem;padding:1.25rem;border-radius:var(--radius-md);display:none}
+.feedback-panel.show{display:block;animation:fadeIn .3s both}
+.feedback-title{font-weight:700;display:flex;align-items:center;gap:.5rem;margin-bottom:.4rem}
+.form-group{margin-bottom:1.5rem}
+.form-label{display:block;font-weight:700;margin-bottom:.5rem}
+.form-control{width:100%;padding:.75rem;border:1.5px solid var(--border-color);border-radius:var(--radius-md);background:var(--bg-color);color:var(--text-main);font-family:inherit;font-size:1rem}
+.form-control:focus{outline:none;border-color:var(--text-main);box-shadow:0 0 0 3px rgba(123,63,160,.25)}
+input[type=range]{accent-color:var(--gold)}
+.radio-group{display:flex;gap:1rem;flex-wrap:wrap}
+.radio-card{flex:1;min-width:120px;position:relative}
+.radio-card input{position:absolute;opacity:0}
+.radio-card label{display:block;width:100%;padding:.9rem;text-align:center;border:1.5px solid var(--border-color);border-radius:var(--radius-md);cursor:pointer;transition:all .2s;background:var(--card-bg);font-weight:500}
+.radio-card input:checked+label{border-color:var(--text-main);background:var(--text-main);color:var(--card-bg)}
+.radio-card input:focus-visible+label{outline:3px solid var(--accent-secondary);outline-offset:2px}
+.podium{display:flex;justify-content:center;align-items:flex-end;gap:.75rem;margin:2rem 0 1.5rem;height:190px}
+.podium-place{display:flex;flex-direction:column;align-items:center;width:92px}
+.podium-bar{width:100%;border-radius:8px 8px 0 0;display:flex;justify-content:center;padding-top:.5rem;color:#fff;font-weight:700;font-family:var(--font-serif);background:var(--accent-primary);animation:rise .8s .2s cubic-bezier(.2,.8,.2,1) both;transform-origin:bottom}
+.podium-1 .podium-bar{height:120px;background:var(--gold)}
+.podium-2 .podium-bar{height:90px;background:#9aa3b2}
+.podium-3 .podium-bar{height:62px;background:#9a5b2c}
+.result-list{list-style:none;margin-top:1rem}
+.result-item{display:flex;justify-content:space-between;gap:1rem;padding:.9rem .25rem;border-bottom:1px dashed var(--border-color);align-items:center}
+.result-item:last-child{border-bottom:none}
+@media (max-width:600px){.card{padding:1.25rem}.spines{height:120px;transform:scale(.85)}.podium-place{width:78px}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+.swal2-container{font-family:var(--font-sans)}
+.swal2-popup{background:var(--card-bg)!important;color:var(--text-main)!important;border-radius:var(--radius-lg)!important;border:1px solid var(--border-color)!important}
+.swal2-title{color:var(--text-main)!important;font-family:var(--font-serif)}
+</style>
+
+</head>
+<body>
+
+    <div id="app">
+        <!-- PANTALLA: INICIO -->
+        <section id="screen-home" class="screen active">
+            <div class="card text-center" style="padding: 3rem 2rem 2.5rem;">
+                <h1 class="title-main">Literatura en Juego</h1>
+                <p class="subtitle">¿Puedes reconocer el género detrás de cada obra?</p>
+                
+                <div class="hero-illustration" aria-hidden="true">
+                    <div class="spines">
+                        <i style="--h:120px;--c:var(--g-narr)"></i>
+                        <i style="--h:150px;--w:40px;--c:var(--g-poe)"></i>
+                        <i style="--h:130px;--w:30px;--c:var(--g-dra)"></i>
+                        <i class="lean" style="--h:140px;--c:var(--g-ens)"></i>
+                    </div>
+                    <div class="shelf"></div>
+                </div>
+                
+                <div class="stack mt-8" style="max-width: 300px; margin-left: auto; margin-right: auto;">
+                    <button class="btn btn-primary" onclick="app.startGame()"><i data-lucide="play"></i> Iniciar partida</button>
+                    <button class="btn btn-secondary" onclick="app.showScreen('screen-instructions')"><i data-lucide="book-open"></i> Cómo jugar</button>
+                    <button class="btn btn-secondary" onclick="app.showScreen('screen-settings')"><i data-lucide="settings"></i> Configuración</button>
+                    <button class="btn btn-secondary" onclick="app.showScreen('screen-credits')"><i data-lucide="info"></i> Créditos</button>
+                </div>
+            </div>
+
+            <div class="card mt-4">
+                <h2 class="mb-4 text-center"><i data-lucide="library"></i> Los cuatro grandes géneros</h2>
+                <p class="mb-4">Los géneros literarios son categorías que permiten agrupar obras de acuerdo con sus características formales, discursivas y comunicativas. Sus fronteras son flexibles y existen obras híbridas, pero estas son sus bases:</p>
+                <div class="grid-2">
+                    <div class="genre-card" style="--c:var(--g-narr)">
+<h3><i data-lucide="book"></i> Narrativa</h3>
+<p>Cuenta acontecimientos protagonizados por personajes en un tiempo y espacio determinados, guiados por la voz de un narrador.</p>
+                    </div>
+                    <div class="genre-card" style="--c:var(--g-poe)">
+<h3><i data-lucide="feather"></i> Poesía</h3>
+<p>Explora la expresión estética mediante el lenguaje, el ritmo, las imágenes literarias y diversos recursos expresivos.</p>
+                    </div>
+                    <div class="genre-card" style="--c:var(--g-dra)">
+<h3><i data-lucide="drama"></i> Dramaturgia</h3>
+<p>Presenta acciones y conflictos directamente mediante diálogos y acotaciones, concebida originalmente para la representación escénica.</p>
+                    </div>
+                    <div class="genre-card" style="--c:var(--g-ens)">
+<h3><i data-lucide="pen-tool"></i> Ensayo</h3>
+<p>Desarrolla una reflexión, interpretación o análisis argumentado sobre un tema desde la perspectiva personal del autor.</p>
+                    </div>
+                </div>
+                <p class="mt-4" style="font-size: 0.85rem; color: var(--text-muted); text-align: center;">
+                    <em>Nota: Estas definiciones son aproximaciones introductorias. La poesía puede narrar historias y el ensayo posee valor literario.</em>
+                </p>
+            </div>
+        </section>
+
+        <!-- PANTALLA: INSTRUCCIONES -->
+        <section id="screen-instructions" class="screen">
+            <div class="card">
+                <div class="flex-between mb-4">
+                    <h2><i data-lucide="book-open"></i> Reglas del Juego</h2>
+                    <button class="btn btn-secondary" style="padding: 0.5rem;" onclick="app.showScreen('screen-home')"><i data-lucide="x"></i></button>
+                </div>
+                
+                <ol class="stack" style="list-style-position: inside; margin-left: 0.5rem; font-size: 1.05rem;">
+                    <li><strong>Lee cuidadosamente</strong> cada pregunta o fragmento literario.</li>
+                    <li><strong>Elige una</strong> de las cuatro opciones de respuesta.</li>
+                    <li>Los jugadores participan <strong>por turnos</strong> sucesivos.</li>
+                    <li>Cada respuesta correcta suma <strong>100 puntos</strong>. No se restan puntos por errores.</li>
+                    <li>Una respuesta incorrecta te permite aprender mediante una breve explicación.</li>
+                    <li>La partida termina cuando se responden todas las preguntas configuradas.</li>
+                    <li>Si activas el cronómetro, deberás responder antes de que termine el tiempo.</li>
+                </ol>
+
+                <div class="flex-center mt-8 gap-4">
+                    <button class="btn btn-secondary" onclick="app.showScreen('screen-home')">Volver</button>
+                    <button class="btn btn-primary" onclick="app.startGame()"><i data-lucide="play"></i> Jugar Ahora</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- PANTALLA: CONFIGURACIÓN -->
+        <section id="screen-settings" class="screen">
+            <div class="card">
+                <div class="flex-between mb-4">
+                    <h2><i data-lucide="settings"></i> Configuración de la Partida</h2>
+                    <button class="btn btn-secondary" style="padding: 0.5rem;" onclick="app.showScreen('screen-home')"><i data-lucide="x"></i></button>
+                </div>
+
+                <form id="settings-form" onsubmit="event.preventDefault(); app.saveSettings();">
+                    <div class="form-group">
+                        <label class="form-label">Tema Visual</label>
+                        <div class="radio-group">
+                            <div class="radio-card">
+                                <input type="radio" name="theme" id="theme-light" value="light" checked onchange="app.previewTheme('light')">
+                                <label for="theme-light">☀️ Claro</label>
+                            </div>
+                            <div class="radio-card">
+                                <input type="radio" name="theme" id="theme-dark" value="dark" onchange="app.previewTheme('dark')">
+                                <label for="theme-dark">🌙 Oscuro</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Número de Jugadores (1-5)</label>
+                        <select id="player-count" class="form-control" onchange="app.renderPlayerInputs()">
+                            <option value="1">1 Jugador</option>
+                            <option value="2">2 Jugadores</option>
+                            <option value="3">3 Jugadores</option>
+                            <option value="4">4 Jugadores</option>
+                            <option value="5">5 Jugadores</option>
+                        </select>
+                        <div id="player-inputs" class="mt-4 stack">
+                            <!-- Inyectado dinámicamente -->
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Límite de Tiempo</label>
+                        <select id="time-limit" class="form-control">
+                            <option value="0">Sin límite de tiempo</option>
+                            <option value="10">10 segundos por pregunta</option>
+                            <option value="15" selected>15 segundos por pregunta</option>
+                            <option value="30">30 segundos por pregunta</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Número de Preguntas Totales</label>
+                        <div class="flex-between">
+                            <input type="range" id="question-count" min="10" max="20" value="10" step="1" class="form-control" style="width: 80%;" oninput="document.getElementById('q-count-val').innerText = this.value">
+                            <span id="q-count-val" style="font-weight: bold; font-size: 1.2rem; width: 15%; text-align: center;">10</span>
+                        </div>
+                    </div>
+
+                    <div class="flex-center mt-8 gap-4">
+                        <button type="button" class="btn btn-secondary" onclick="app.showScreen('screen-home')">Cancelar</button>
+                        <button type="submit" class="btn btn-primary"><i data-lucide="save"></i> Guardar y Volver</button>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+        <!-- PANTALLA: CRÉDITOS -->
+        <section id="screen-credits" class="screen">
+            <div class="card text-center">
+                <h2><i data-lucide="info"></i> Créditos</h2>
+                <div class="hero-illustration" style="font-size: 3rem;">✒️</div>
+                <h3 class="mt-4">Diseño y desarrollo conceptual</h3>
+                <p style="font-size: 1.2rem; font-weight: 600; color: var(--accent-primary);" class="mt-2">Karla Loranca Viveros, 2026.</p>
+                <p class="mt-4" style="color: var(--text-muted); max-width: 400px; margin-left: auto; margin-right: auto;">
+                    Videojuego educativo para explorar, reconocer y comprender los cuatro grandes géneros literarios: narrativa, poesía, dramaturgia y ensayo.
+                </p>
+                <div class="mt-8">
+                    <button class="btn btn-secondary" onclick="app.showScreen('screen-home')"><i data-lucide="home"></i> Volver al Inicio</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- PANTALLA: JUEGO -->
+        <section id="screen-game" class="screen">
+            <div class="game-header flex-between">
+                <div>
+                    <h3 style="font-size: 1.1rem; margin:0;">Literatura en Juego</h3>
+                    <span style="font-size: 0.85rem; color: var(--text-muted);" id="game-progress-text">Pregunta 1 de 10</span>
+                </div>
+                <div class="flex-center gap-4">
+                    <div id="game-timer-container" class="timer" style="display:none;">
+                        <i data-lucide="clock"></i> <span id="game-timer">15</span><div class="timer-track"><div id="timer-fill"></div></div>
+                    </div>
+                    <button class="btn btn-secondary" style="padding: 0.4rem;" onclick="app.confirmExit()" aria-label="Pausar o salir"><i data-lucide="pause"></i></button>
+                </div>
+            </div>
+            <div class="progress-bar-container mb-4">
+                <div id="game-progress-bar" class="progress-bar" style="width: 0%;"></div>
+            </div>
+
+            <div id="game-players" class="players-panel">
+                <!-- Inyectado dinámicamente -->
+            </div>
+
+            <div class="card">
+                <div id="question-container">
+                    <h2 id="q-text" class="mb-4" style="font-size: 1.4rem;">Cargando pregunta...</h2>
+                    <div id="q-fragment-container" style="display: none;">
+                        <div class="fragment-box">
+                            <span id="q-fragment"></span>
+                            <span id="q-author" class="fragment-author"></span>
+                        </div>
+                    </div>
+                    
+                    <div id="q-options" class="grid-2 mt-4">
+                        <!-- Botones de opciones inyectados aquí -->
+                    </div>
+                </div>
+
+                <div id="q-feedback" class="feedback-panel">
+                    <div id="feedback-title" class="feedback-title"></div>
+                    <p id="feedback-text" style="font-size: 0.95rem;"></p>
+                    <div class="mt-4" style="text-align: right;">
+                        <button id="btn-next-turn" class="btn btn-primary" onclick="app.nextTurn()">Siguiente <i data-lucide="arrow-right"></i></button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PANTALLA: RESULTADOS -->
+        <section id="screen-results" class="screen">
+            <div class="card">
+                <h1 class="title-main mb-2">¡Partida Terminada!</h1>
+                <p id="results-subtitle" class="subtitle mb-4">Aquí están los resultados finales.</p>
+                
+                <div id="results-podium" class="podium">
+                    <!-- Podio generado dinámicamente -->
+                </div>
+
+                <div class="card" style="box-shadow: none; background: var(--bg-color); border: 1px solid var(--border-color);">
+                    <h3 class="mb-2">Clasificación Final</h3>
+                    <ul id="results-list" class="result-list">
+                        <!-- Lista generada dinámicamente -->
+                    </ul>
+                </div>
+
+                <div class="flex-center mt-8 gap-4 flex-wrap">
+                    <button class="btn btn-primary" onclick="app.startGame()"><i data-lucide="rotate-ccw"></i> Volver a Jugar</button>
+                    <button class="btn btn-secondary" onclick="app.showScreen('screen-settings')"><i data-lucide="settings"></i> Cambiar Configuración</button>
+                    <button class="btn btn-secondary" onclick="app.showScreen('screen-home')"><i data-lucide="home"></i> Inicio</button>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        const questionBank = [
+            // --- NARRATIVA (10 preguntas) ---
+            { id: "n1", type: 1, text: "¿Qué género suele organizarse mediante narrador, personajes, acontecimientos, tiempo y espacio?", options: ["Narrativa", "Poesía", "Dramaturgia", "Ensayo"], correctIndex: 0, explanation: "La narrativa construye mundos a través de una voz (narrador) que relata hechos sucesivos que le ocurren a los personajes.", genre: "Narrativa" },
+            { id: "n2", type: 1, text: "¿Qué característica distingue a la narrativa literaria de una mera crónica periodística?", options: ["La intención estética y la creación de un mundo de ficción verosímil.", "La exactitud de las fechas y lugares reales.", "El uso exclusivo de rimas consonantes.", "La ausencia de personajes secundarios."], correctIndex: 0, explanation: "Aunque se base en la realidad, la narrativa literaria elabora estéticamente su discurso y crea un pacto de ficción (verosimilitud) con el lector.", genre: "Narrativa" },
+            { id: "n3", type: 3, text: "¿A qué género pertenece la novela 'Cien años de soledad' de Gabriel García Márquez?", options: ["Narrativa", "Poesía", "Dramaturgia", "Ensayo"], correctIndex: 0, explanation: "Es una de las novelas más representativas de la narrativa hispanoamericana y del realismo mágico.", genre: "Narrativa" },
+            { id: "n4", type: 3, text: "¿A qué género pertenece la novela 'Frankenstein' de Mary Shelley?", options: ["Narrativa", "Ensayo", "Dramaturgia", "Poesía"], correctIndex: 0, explanation: "Es una novela epistolar, un formato característico de la narrativa en el que la historia se cuenta a través de cartas.", genre: "Narrativa" },
+            { id: "n5", type: 3, text: "¿A qué género pertenece 'Don Quijote de la Mancha' de Miguel de Cervantes?", options: ["Narrativa", "Ensayo", "Dramaturgia", "Poesía"], correctIndex: 0, explanation: "Es la obra cumbre de la narrativa en español y está considerada la primera novela moderna.", genre: "Narrativa" },
+            { id: "n6", type: 3, text: "¿A qué género pertenece 'Pedro Páramo' de Juan Rulfo?", options: ["Narrativa", "Poesía", "Dramaturgia", "Ensayo"], correctIndex: 0, explanation: "Es una novela corta indispensable de la narrativa mexicana contemporánea.", genre: "Narrativa" },
+            { id: "n7", type: 3, text: "¿A qué género pertenece 'El principito' de Antoine de Saint-Exupéry?", options: ["Narrativa", "Poesía", "Dramaturgia", "Ensayo"], correctIndex: 0, explanation: "Es una novela corta o relato poético-filosófico, enmarcado dentro de la narrativa por su estructura.", genre: "Narrativa" },
+            { id: "n8", type: 2, text: "Lee el siguiente fragmento e identifica a qué género pertenece.", fragment: "Muchos años después, frente al pelotón de fusilamiento, el coronel Aureliano Buendía había de recordar aquella tarde remota en que su padre lo llevó a conocer el hielo.", author: "Gabriel García Márquez, Cien años de soledad", options: ["Narrativa", "Poesía", "Dramaturgia", "Ensayo"], correctIndex: 0, explanation: "El uso de un narrador en tercera persona para relatar un acontecimiento en un tiempo específico es un claro indicador de la narrativa.", genre: "Narrativa" },
+            { id: "n9", type: 2, text: "Lee el siguiente fragmento e identifica su género literario predominante.", fragment: "Vine a Comala porque me dijeron que acá vivía mi padre, un tal Pedro Páramo. Mi madre me lo dijo. Y yo le prometí que vendría a verlo en cuanto ella muriera.", author: "Juan Rulfo, Pedro Páramo", options: ["Narrativa", "Poesía", "Dramaturgia", "Ensayo"], correctIndex: 0, explanation: "Es el inicio clásico de una novela narrativa, introduciendo a un narrador protagonista, una motivación y un espacio.", genre: "Narrativa" },
+            { id: "n10", type: 1, text: "Dentro de la narrativa, ¿qué subgénero se caracteriza por su brevedad, pocos personajes y un único conflicto central?", options: ["El cuento", "La novela", "La epopeya", "El ensayo"], correctIndex: 0, explanation: "El cuento es una narración breve que se enfoca en un solo incidente o conflicto principal para lograr intensidad.", genre: "Narrativa" },
+
+            // --- POESÍA (10 preguntas) ---
+            { id: "p1", type: 1, text: "¿Qué género explora la expresión estética mediante el lenguaje, el ritmo, las imágenes y diversos recursos expresivos?", options: ["Poesía", "Narrativa", "Dramaturgia", "Ensayo"], correctIndex: 0, explanation: "La poesía prioriza la función poética del lenguaje, moldeando las palabras para crear ritmo, musicalidad y múltiples significados.", genre: "Poesía" },
+            { id: "p2", type: 1, text: "¿Qué recursos literarios son fundamentales para la construcción rítmica y expresiva de un poema tradicional?", options: ["Métrica, rima, ritmo y figuras retóricas.", "Planteamiento, nudo y desenlace.", "Diálogos, acotaciones y actos.", "Tesis, argumentos y conclusión."], correctIndex: 0, explanation: "La métrica y la rima, combinadas con figuras retóricas como la metáfora, son herramientas esenciales en la tradición poética.", genre: "Poesía" },
+            { id: "p3", type: 3, text: "¿A qué género pertenece la obra 'Veinte poemas de amor y una canción desesperada' de Pablo Neruda?", options: ["Poesía", "Narrativa", "Dramaturgia", "Ensayo"], correctIndex: 0, explanation: "Es uno de los libros de poesía amorosa más leídos y célebres del siglo XX.", genre: "Poesía" },
+            { id: "p4", type: 3, text: "¿A qué género pertenece la obra 'Romancero gitano' de Federico García Lorca?", options: ["Poesía", "Narrativa", "Dramaturgia", "Ensayo"], correctIndex: 0, explanation: "Es una obra poética que fusiona la tradición popular del romance con las vanguardias.", genre: "Poesía" },
+            { id: "p5", type: 3, text: "¿A qué género pertenece 'Hojas de hierba' de Walt Whitman?", options: ["Poesía", "Narrativa", "Dramaturgia", "Ensayo"], correctIndex: 0, explanation: "Es una obra fundamental de la poesía estadounidense, pionera en el uso del verso libre.", genre: "Poesía" },
+            { id: "p6", type: 3, text: "¿A qué género pertenece 'Primero sueño' de Sor Juana Inés de la Cruz?", options: ["Poesía", "Ensayo", "Dramaturgia", "Narrativa"], correctIndex: 0, explanation: "Es un extenso poema filosófico representativo del barroco y la poesía novohispana.", genre: "Poesía" },
+            { id: "p7", type: 2, text: "Lee el siguiente fragmento e identifica a qué género literario pertenece.", fragment: "Puedo escribir los versos más tristes esta noche.\nEscribir, por ejemplo: «La noche está estrellada,\ny tiritan, azules, los astros, a lo lejos».", author: "Pablo Neruda, Veinte poemas de amor...", options: ["Poesía", "Dramaturgia", "Narrativa", "Ensayo"], correctIndex: 0, explanation: "La disposición gráfica en versos, la musicalidad y la exploración profunda de los sentimientos revelan que es poesía.", genre: "Poesía" },
+            { id: "p8", type: 2, text: "Lee el siguiente fragmento e identifica su género predominante.", fragment: "¿Qué es poesía?, dices mientras clavas\nen mi pupila tu pupila azul.\n¿Qué es poesía? ¿Y tú me lo preguntas?\nPoesía... eres tú.", author: "Gustavo Adolfo Bécquer, Rimas", options: ["Poesía", "Dramaturgia", "Narrativa", "Ensayo"], correctIndex: 0, explanation: "El uso evidente de la rima, la métrica asonante y la brevedad evocativa son marcas clásicas de la poesía lírica.", genre: "Poesía" },
+            { id: "p9", type: 1, text: "A diferencia de la poesía tradicional, ¿qué característica define a la poesía en verso libre?", options: ["Ausencia de rima regular y métrica fija.", "Ausencia de metáforas.", "Narración de batallas épicas exclusivamente.", "Uso de personajes y diálogos obligatorios."], correctIndex: 0, explanation: "El verso libre rompe con la métrica y rima estructurada, buscando el ritmo interior y la libertad expresiva de las palabras.", genre: "Poesía" },
+            { id: "p10", type: 2, text: "Identifica el género literario del siguiente texto breve.", fragment: "Hombres necios que acusáis\na la mujer sin razón,\nsin ver que sois la ocasión\nde lo mismo que culpáis.", author: "Sor Juana Inés de la Cruz, Redondillas", options: ["Poesía", "Narrativa", "Dramaturgia", "Ensayo"], correctIndex: 0, explanation: "Se trata de una estrofa poética llamada redondilla (cuatro versos octosílabos con rima consonante abba).", genre: "Poesía" },
+
+            // --- DRAMATURGIA (10 preguntas) ---
+            { id: "d1", type: 1, text: "¿Qué género presenta acciones y conflictos directamente mediante diálogos y situaciones concebidas para la representación escénica?", options: ["Dramaturgia", "Poesía", "Narrativa", "Ensayo"], correctIndex: 0, explanation: "La dramaturgia, o texto teatral, está estructurada a través de las voces directas de los personajes (diálogos) para ser actuada frente a un público.", genre: "Dramaturgia" },
+            { id: "d2", type: 1, text: "En un texto teatral, ¿cómo se llaman las indicaciones que hace el autor sobre escenografía, actitudes y movimientos de los actores?", options: ["Acotaciones", "Parlamentos", "Versos", "Conclusiones"], correctIndex: 0, explanation: "Las acotaciones (generalmente entre paréntesis o en cursiva) son las instrucciones del dramaturgo para la puesta en escena.", genre: "Dramaturgia" },
+            { id: "d3", type: 3, text: "¿A qué género pertenece la obra 'Romeo y Julieta' de William Shakespeare?", options: ["Dramaturgia", "Poesía", "Narrativa", "Ensayo"], correctIndex: 0, explanation: "Es una de las tragedias teatrales (dramaturgia) más representadas de todos los tiempos.", genre: "Dramaturgia" },
+            { id: "d4", type: 3, text: "¿A qué género pertenece 'La casa de Bernarda Alba' de Federico García Lorca?", options: ["Dramaturgia", "Poesía", "Narrativa", "Ensayo"], correctIndex: 0, explanation: "Es una obra de teatro fundamental de la dramaturgia española del siglo XX.", genre: "Dramaturgia" },
+            { id: "d5", type: 3, text: "¿A qué género pertenece 'La vida es sueño' de Pedro Calderón de la Barca?", options: ["Dramaturgia", "Poesía", "Narrativa", "Ensayo"], correctIndex: 0, explanation: "Es una obra cumbre del teatro barroco español, escrita para ser representada en escena.", genre: "Dramaturgia" },
+            { id: "d6", type: 3, text: "¿A qué género pertenece la obra 'Antígona' de Sófocles?", options: ["Dramaturgia", "Poesía", "Narrativa", "Ensayo"], correctIndex: 0, explanation: "Es una de las grandes tragedias de la dramaturgia clásica griega.", genre: "Dramaturgia" },
+            { id: "d7", type: 2, text: "Lee el siguiente fragmento e identifica a qué género pertenece.", fragment: "(Aparece HAMLET, vestido de negro. Camina lentamente por la sala)\nHAMLET: Ser, o no ser, esa es la cuestión. ¿Qué es más noble para el alma...", author: "William Shakespeare, Hamlet (Adaptación de formato)", options: ["Dramaturgia", "Poesía", "Narrativa", "Ensayo"], correctIndex: 0, explanation: "La presencia del nombre del personaje antes de hablar y de acotaciones indicando la acción escénica son rasgos de la dramaturgia.", genre: "Dramaturgia" },
+            { id: "d8", type: 2, text: "Identifica el género literario del siguiente fragmento.", fragment: "BERNARDA: (Golpeando con el bastón en el suelo). ¡Silencio! Menos gritos y más obras. A tu edad no se habla delante de las personas mayores.\nANGUSTIAS: Madre, no la regañe usted.", author: "F. García Lorca, La casa de Bernarda Alba", options: ["Dramaturgia", "Poesía", "Narrativa", "Ensayo"], correctIndex: 0, explanation: "El diálogo directo estructurado por turnos de los personajes y las acotaciones sobre las acciones físicas revelan que es un texto teatral.", genre: "Dramaturgia" },
+            { id: "d9", type: 1, text: "¿Cuáles son los dos subgéneros principales clásicos de la dramaturgia que nacieron en la antigua Grecia?", options: ["Tragedia y comedia", "Cuento y novela", "Oda y elegía", "Ensayo e informe"], correctIndex: 0, explanation: "La tragedia (con final funesto) y la comedia (de tono festivo) son los pilares fundamentales del teatro clásico.", genre: "Dramaturgia" },
+            { id: "d10", type: 3, text: "¿A qué género literario pertenece la obra teatral 'Fuenteovejuna' de Lope de Vega?", options: ["Dramaturgia", "Poesía", "Narrativa", "Ensayo"], correctIndex: 0, explanation: "Es una pieza teatral clave del Siglo de Oro español, lo que la ubica indiscutiblemente en la dramaturgia.", genre: "Dramaturgia" },
+
+            // --- ENSAYO (10 preguntas) ---
+            { id: "e1", type: 1, text: "¿Qué género literario desarrolla una reflexión, interpretación o análisis argumentado sobre un tema desde la perspectiva personal del autor?", options: ["Ensayo", "Narrativa", "Poesía", "Dramaturgia"], correctIndex: 0, explanation: "El ensayo es un texto en prosa en el que el autor expone sus ideas y reflexiones personales sobre un tema, buscando persuadir o invitar a pensar.", genre: "Ensayo" },
+            { id: "e2", type: 1, text: "¿Cuál es una de las características fundamentales del ensayo literario?", options: ["La subjetividad y el estilo cuidadoso en la argumentación.", "La rima asonante en todos los párrafos.", "El uso indispensable de escenarios teatrales.", "La narración de una historia completamente ficticia."], correctIndex: 0, explanation: "A diferencia de un artículo científico frío, el ensayo literario aporta la voz subjetiva del autor (sus reflexiones) cuidando la forma estética del texto.", genre: "Ensayo" },
+            { id: "e3", type: 3, text: "¿A qué género literario pertenece 'El laberinto de la soledad' de Octavio Paz?", options: ["Ensayo", "Narrativa", "Poesía", "Dramaturgia"], correctIndex: 0, explanation: "Es un extenso ensayo donde el autor reflexiona y argumenta sobre la identidad, historia y psicología del mexicano.", genre: "Ensayo" },
+            { id: "e4", type: 3, text: "¿A qué género pertenece 'Una habitación propia' de Virginia Woolf?", options: ["Ensayo", "Narrativa", "Poesía", "Dramaturgia"], correctIndex: 0, explanation: "Es un ensayo fundamental del feminismo del siglo XX, basado en una serie de conferencias impartidas por la autora.", genre: "Ensayo" },
+            { id: "e5", type: 3, text: "¿A qué género pertenece la obra 'Nuestra América' de José Martí?", options: ["Ensayo", "Narrativa", "Poesía", "Dramaturgia"], correctIndex: 0, explanation: "Es un ensayo político y filosófico clave para entender el pensamiento latinoamericano del siglo XIX.", genre: "Ensayo" },
+            { id: "e6", type: 3, text: "¿A qué género pertenece 'El arco y la lira' de Octavio Paz?", options: ["Ensayo", "Poesía", "Narrativa", "Dramaturgia"], correctIndex: 0, explanation: "Es una obra donde reflexiona profundamente sobre el fenómeno poético y el lenguaje.", genre: "Ensayo" },
+            { id: "e7", type: 2, text: "Lee el siguiente fragmento e identifica su género literario.", fragment: "No hay nada más terrible que la incomprensión de uno mismo. Y esa es, precisamente, la gran tragedia de nuestra época: vivimos rodeados de espejos que no reflejan nuestra esencia...", author: "Reflexión hipotética contemporánea", options: ["Ensayo", "Narrativa", "Poesía", "Dramaturgia"], correctIndex: 0, explanation: "La argumentación directa sobre una idea o problema contemporáneo, sin recurrir a la creación de personajes o versos, es típica del ensayo.", genre: "Ensayo" },
+            { id: "e8", type: 1, text: "A diferencia del texto científico, ¿qué busca primordialmente el ensayo literario?", options: ["Persuadir e invitar a la reflexión con un estilo cuidado.", "Demostrar hipótesis empíricas con fórmulas exactas.", "Crear diálogos para ser representados en un teatro.", "Contar una historia estructurada con inicio, nudo y desenlace."], correctIndex: 0, explanation: "El ensayo no busca establecer una verdad absoluta, sino ofrecer una provocación intelectual escrita con alto valor estético.", genre: "Ensayo" },
+            { id: "e9", type: 3, text: "¿A qué género pertenece 'Los hijos de los días' de Eduardo Galeano?", options: ["Ensayo", "Poesía", "Dramaturgia", "Narrativa"], correctIndex: 0, explanation: "Aunque Galeano mezcla narración y crónica, la obra es fundamentalmente un ensayo reflexivo sobre la historia y la humanidad.", genre: "Ensayo" },
+            { id: "e10", type: 1, text: "¿Quién es considerado el 'creador' o padre del ensayo moderno gracias a su obra publicada en 1580?", options: ["Michel de Montaigne", "William Shakespeare", "Miguel de Cervantes", "Sor Juana Inés de la Cruz"], correctIndex: 0, explanation: "El filósofo francés Michel de Montaigne acuñó el término 'Essais' (Ensayos) para describir sus reflexiones y divagaciones personales.", genre: "Ensayo" }
+        ];
+
+        const app = {
+            settings: {
+                theme: 'light',
+                playerCount: 1,
+                players: ['Jugador 1'],
+                timeLimit: 15,
+                totalQuestions: 10
+            },
+            gameState: {
+                players: [],
+                questions: [],
+                currentQuestionIndex: 0,
+                currentPlayerIndex: 0,
+                timer: null,
+                timeLeft: 0,
+                isAnswered: false,
+                currentCorrectIndex: -1
+            },
+
+            // Navegación de pantallas
+            showScreen: function(screenId) {
+                document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+                document.getElementById(screenId).classList.add('active');
+                if (screenId === 'screen-settings') this.renderPlayerInputs();
+                lucide.createIcons();
+            },
+
+            // Previsualización y guardado de tema
+            previewTheme: function(theme) {
+                document.documentElement.setAttribute('data-theme', theme);
+            },
+
+            // Renderizar inputs de nombres de jugadores dinámicamente
+            renderPlayerInputs: function() {
+                const count = parseInt(document.getElementById('player-count').value);
+                const container = document.getElementById('player-inputs');
+                container.innerHTML = '';
+                
+                for (let i = 0; i < count; i++) {
+                    const currentName = this.settings.players[i] || `Jugador ${i + 1}`;
+                    container.innerHTML += `
+                        <input type="text" id="p-name-${i}" class="form-control" placeholder="Nombre del Jugador ${i + 1}" value="${currentName}" required maxlength="15">
+                    `;
+                }
+            },
+
+            saveSettings: function() {
+                this.settings.theme = document.querySelector('input[name="theme"]:checked').value;
+                this.previewTheme(this.settings.theme);
+                
+                this.settings.playerCount = parseInt(document.getElementById('player-count').value);
+                this.settings.timeLimit = parseInt(document.getElementById('time-limit').value);
+                this.settings.totalQuestions = parseInt(document.getElementById('question-count').value);
+                
+                this.settings.players = [];
+                for (let i = 0; i < this.settings.playerCount; i++) {
+                    const nameInput = document.getElementById(`p-name-${i}`).value.trim();
+                    this.settings.players.push(nameInput || `Jugador ${i + 1}`);
+                }
+
+                Swal.fire({
+                    icon: 'success',
+                    title: '¡Configuración guardada!',
+                    showConfirmButton: false,
+                    timer: 1500,
+                    toast: true,
+                    position: 'top-end'
+                });
+                this.showScreen('screen-home');
+            },
+
+            // Mezclar array (Fisher-Yates)
+            shuffleArray: function(array) {
+                const newArray = [...array];
+                for (let i = newArray.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+                }
+                return newArray;
+            },
+
+            startGame: function() {
+                // Configurar jugadores para la partida
+                this.gameState.players = this.settings.players.map(name => ({
+                    name: name,
+                    score: 0,
+                    correctAnswers: 0
+                }));
+
+                // Seleccionar preguntas aleatorias
+                const shuffledBank = this.shuffleArray(questionBank);
+                this.gameState.questions = shuffledBank.slice(0, Math.min(this.settings.totalQuestions, questionBank.length));
+                
+                // Reiniciar variables
+                this.gameState.currentQuestionIndex = 0;
+                this.gameState.currentPlayerIndex = 0;
+                this.gameState.isAnswered = false;
+
+                this.showScreen('screen-game');
+                this.renderQuestion();
+            },
+
+            renderQuestion: function() {
+                this.gameState.isAnswered = false;
+                const question = this.gameState.questions[this.gameState.currentQuestionIndex];
+                const currentPlayer = this.gameState.players[this.gameState.currentPlayerIndex];
+                
+                // UI: Cabecera y progreso
+                document.getElementById('game-progress-text').innerText = `Pregunta ${this.gameState.currentQuestionIndex + 1} de ${this.gameState.questions.length}`;
+                const progressPct = ((this.gameState.currentQuestionIndex) / this.gameState.questions.length) * 100;
+                document.getElementById('game-progress-bar').style.width = `${progressPct}%`;
+                
+                // UI: Jugadores
+                const playersContainer = document.getElementById('game-players');
+                playersContainer.innerHTML = '';
+                this.gameState.players.forEach((p, index) => {
+                    const isActive = index === this.gameState.currentPlayerIndex;
+                    playersContainer.innerHTML += `
+                        <div class="player-badge ${isActive ? 'active' : ''}">
+                            <i data-lucide="${isActive ? 'user-check' : 'user'}"></i> 
+                            ${p.name}: ${p.score} pts
+                        </div>
+                    `;
+                });
+
+                // UI: Pregunta y fragmento
+                document.getElementById('q-text').innerText = question.text;
+                const fragmentContainer = document.getElementById('q-fragment-container');
+                if (question.fragment) {
+                    fragmentContainer.style.display = 'block';
+                    document.getElementById('q-fragment').innerHTML = `"${question.fragment.replace(/\n/g, '<br>')}"`;
+                    document.getElementById('q-author').innerText = `- ${question.author}`;
+                } else {
+                    fragmentContainer.style.display = 'none';
+                }
+
+                // UI: Opciones (Mezcladas)
+                const optionsContainer = document.getElementById('q-options');
+                optionsContainer.innerHTML = '';
+                
+                // Crear array de opciones con índice original para mantener referencia
+                let optionsWithIndex = question.options.map((opt, i) => ({ text: opt, originalIndex: i }));
+                optionsWithIndex = this.shuffleArray(optionsWithIndex);
+                
+                // Buscar cuál es el nuevo índice de la opción correcta
+                this.gameState.currentCorrectIndex = optionsWithIndex.findIndex(o => o.originalIndex === question.correctIndex);
+
+                optionsWithIndex.forEach((opt, index) => {
+                    const btn = document.createElement('button');
+                    btn.className = 'btn-option';
+                    btn.innerHTML = `<span class="opt-letter">${String.fromCharCode(65 + index)}</span><span class="opt-text">${opt.text}</span><span class="icon-wrapper"><i data-lucide="circle"></i></span>`;
+                    btn.onclick = () => this.selectOption(index, btn);
+                    optionsContainer.appendChild(btn);
+                });
+
+                // Ocultar feedback
+                const feedbackPanel = document.getElementById('q-feedback');
+                feedbackPanel.classList.remove('show');
+                feedbackPanel.style.display = 'none';
+
+                lucide.createIcons();
+                this.startTimer();
+            },
+
+            startTimer: function() {
+                clearInterval(this.gameState.timer);
+                const timerContainer = document.getElementById('game-timer-container');
+                const timerSpan = document.getElementById('game-timer');
+                
+                if (this.settings.timeLimit > 0) {
+                    timerContainer.style.display = 'flex';
+                    this.gameState.timeLeft = this.settings.timeLimit;
+                    timerSpan.innerText = this.gameState.timeLeft;
+                    timerSpan.parentElement.classList.remove('warning');
+                    const fill = document.getElementById('timer-fill'); fill.style.transition = 'none'; fill.style.width = '100%'; void fill.offsetWidth; fill.style.transition = '';
+                    
+                    this.gameState.timer = setInterval(() => {
+                        this.gameState.timeLeft--;
+                        timerSpan.innerText = this.gameState.timeLeft;
+                        fill.style.width = (Math.max(this.gameState.timeLeft,0) / this.settings.timeLimit * 100) + '%';
+                        
+                        if (this.gameState.timeLeft <= 5) {
+                            timerSpan.parentElement.classList.add('warning');
+                        }
+                        
+                        if (this.gameState.timeLeft <= 0) {
+                            clearInterval(this.gameState.timer);
+                            if (!this.gameState.isAnswered) {
+                                this.handleTimeUp();
+                            }
+                        }
+                    }, 1000);
+                } else {
+                    timerContainer.style.display = 'none';
+                }
+            },
+
+            handleTimeUp: function() {
+                this.gameState.isAnswered = true;
+                const options = document.querySelectorAll('.btn-option');
+                options.forEach(opt => opt.disabled = true);
+                
+                // Marcar la correcta
+                options[this.gameState.currentCorrectIndex].classList.add('correct');
+                options[this.gameState.currentCorrectIndex].querySelector('.icon-wrapper').innerHTML = '<i data-lucide="check-circle"></i>';
+                
+                this.showFeedback(false, "¡Se acabó el tiempo!");
+                lucide.createIcons();
+            },
+
+            selectOption: function(selectedIndex, btnElement) {
+                if (this.gameState.isAnswered) return;
+                this.gameState.isAnswered = true;
+                clearInterval(this.gameState.timer);
+
+                const isCorrect = selectedIndex === this.gameState.currentCorrectIndex;
+                const options = document.querySelectorAll('.btn-option');
+                const question = this.gameState.questions[this.gameState.currentQuestionIndex];
+                
+                options.forEach(opt => opt.disabled = true); // Deshabilitar botones
+                
+                if (isCorrect) {
+                    btnElement.classList.add('correct');
+                    btnElement.querySelector('.icon-wrapper').innerHTML = '<i data-lucide="check-circle"></i>';
+                    
+                    // Actualizar puntos
+                    const player = this.gameState.players[this.gameState.currentPlayerIndex];
+                    player.score += 100;
+                    player.correctAnswers++;
+                } else {
+                    btnElement.classList.add('incorrect');
+                    btnElement.querySelector('.icon-wrapper').innerHTML = '<i data-lucide="x-circle"></i>';
+                    
+                    // Resaltar también la correcta
+                    options[this.gameState.currentCorrectIndex].classList.add('correct');
+                    options[this.gameState.currentCorrectIndex].querySelector('.icon-wrapper').innerHTML = '<i data-lucide="check-circle"></i>';
+                }
+
+                this.showFeedback(isCorrect, isCorrect ? "¡Respuesta Correcta!" : "Respuesta Incorrecta");
+                lucide.createIcons();
+            },
+
+            showFeedback: function(isCorrect, title) {
+                const question = this.gameState.questions[this.gameState.currentQuestionIndex];
+                const feedbackPanel = document.getElementById('q-feedback');
+                const feedbackTitle = document.getElementById('feedback-title');
+                const feedbackText = document.getElementById('feedback-text');
+                
+                feedbackPanel.style.display = 'block';
+                feedbackPanel.className = `feedback-panel show ${isCorrect ? 'correct-bg' : 'incorrect-bg'}`;
+                feedbackPanel.style.backgroundColor = isCorrect ? 'var(--correct-bg)' : 'var(--incorrect-bg)';
+                feedbackPanel.style.border = `1px solid ${isCorrect ? 'var(--correct-border)' : 'var(--incorrect-border)'}`;
+                
+                const icon = isCorrect ? '<i data-lucide="check-circle" style="color:var(--correct-border);"></i>' : '<i data-lucide="alert-circle" style="color:var(--incorrect-border);"></i>';
+                const colorClass = isCorrect ? 'var(--correct-text)' : 'var(--incorrect-text)';
+                
+                feedbackTitle.innerHTML = `${icon} <span style="color:${colorClass}">${title}</span>`;
+                feedbackText.innerHTML = `<span style="color:${colorClass}"><strong>${question.genre}:</strong> ${question.explanation}</span>`;
+                
+                // Actualizar puntuación visual en el panel superior inmediatamente
+                const playersContainer = document.getElementById('game-players');
+                playersContainer.children[this.gameState.currentPlayerIndex].innerHTML = `
+                    <i data-lucide="user-check"></i> 
+                    ${this.gameState.players[this.gameState.currentPlayerIndex].name}: ${this.gameState.players[this.gameState.currentPlayerIndex].score} pts
+                `;
+                
+                lucide.createIcons();
+            },
+
+            nextTurn: function() {
+                this.gameState.currentQuestionIndex++;
+                
+                if (this.gameState.currentQuestionIndex >= this.gameState.questions.length) {
+                    this.endGame();
+                } else {
+                    // Siguiente jugador (turno cíclico)
+                    this.gameState.currentPlayerIndex = (this.gameState.currentPlayerIndex + 1) % this.gameState.players.length;
+                    this.renderQuestion();
+                }
+            },
+
+            endGame: function() {
+                clearInterval(this.gameState.timer);
+                this.showScreen('screen-results');
+                
+                // Ordenar jugadores por puntuación
+                const sortedPlayers = [...this.gameState.players].sort((a, b) => b.score - a.score);
+                
+                const podiumContainer = document.getElementById('results-podium');
+                const listContainer = document.getElementById('results-list');
+                
+                podiumContainer.innerHTML = '';
+                listContainer.innerHTML = '';
+
+                // Construir Podio (solo si hay más de 1 jugador, para darle sentido, o 1 en el centro)
+                if (sortedPlayers.length === 1) {
+                    podiumContainer.innerHTML = `
+                        <div class="podium-place podium-1" style="width: 120px;">
+                            <div style="font-size: 2rem;">🏆</div>
+                            <div style="font-weight: 600; margin-bottom: 0.5rem; text-align: center;">${sortedPlayers[0].name}</div>
+                            <div class="podium-bar">${sortedPlayers[0].score}</div>
+                        </div>
+                    `;
+                } else {
+                    // Orden para el podio visual (2do, 1ro, 3ro)
+                    const podiumOrder = [];
+                    if (sortedPlayers.length >= 2) podiumOrder.push({ p: sortedPlayers[1], rank: 2 });
+                    podiumOrder.push({ p: sortedPlayers[0], rank: 1 });
+                    if (sortedPlayers.length >= 3) podiumOrder.push({ p: sortedPlayers[2], rank: 3 });
+
+                    podiumOrder.forEach(item => {
+                        let icon = item.rank === 1 ? '🏆' : item.rank === 2 ? '🥈' : '🥉';
+                        podiumContainer.innerHTML += `
+                            <div class="podium-place podium-${item.rank}">
+                                <div style="font-size: 1.5rem;">${icon}</div>
+                                <div style="font-weight: 600; margin-bottom: 0.5rem; font-size: 0.9rem; text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; width: 100%;">${item.p.name}</div>
+                                <div class="podium-bar">${item.p.score}</div>
+                            </div>
+                        `;
+                    });
+                }
+
+                // Construir Lista
+                sortedPlayers.forEach((p, idx) => {
+                    listContainer.innerHTML += `
+                        <li class="result-item">
+                            <div><span style="font-weight: bold; width: 24px; display: inline-block;">#${idx + 1}</span> ${p.name}</div>
+                            <div style="font-weight: 600;">${p.score} pts <span style="font-size: 0.8rem; color: var(--text-muted); font-weight: normal;">(${p.correctAnswers} correctas)</span></div>
+                        </li>
+                    `;
+                });
+
+                // Confeti 🎉
+                confetti({
+                    particleCount: 150,
+                    spread: 70,
+                    origin: { y: 0.6 },
+                    colors: ['#1f4e8c', '#7b3fa0', '#b4412e', '#1f7a5f', '#b7862a']
+                });
+            },
+
+            // Confirmación de salida
+            confirmExit: function() {
+                clearInterval(this.gameState.timer);
+                Swal.fire({
+                    title: '¿Abandonar la partida?',
+                    text: "El progreso actual se perderá.",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: 'var(--incorrect-border)',
+                    cancelButtonColor: 'var(--text-muted)',
+                    confirmButtonText: 'Sí, salir',
+                    cancelButtonText: 'Cancelar'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        this.showScreen('screen-home');
+                    } else {
+                        // Reanudar temporizador si es necesario y si la pregunta no ha sido respondida
+                        if (!this.gameState.isAnswered && this.settings.timeLimit > 0) {
+                            this.startTimer();
+                        }
+                    }
+                });
+            }
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Inicializar iconos de Lucide
+            lucide.createIcons();
+            
+            // Renderizar inputs iniciales
+            app.renderPlayerInputs();
+        });
+
+    </script>
+</body>
+</html>
